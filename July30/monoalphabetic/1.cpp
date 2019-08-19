@@ -50,18 +50,17 @@ void p_to_c(string file, string ofile, string key)
 
     while(!ip.eof())
     {
-        char b[26];
-        ip2.getline(b, 26);
-        char res[1000];
-        char a[1000];
-        ip.getline(a, 1000);
-        int j = 0;
-        for(int i = 0; i < 1000; i++)
+        string b;
+        getline(ip2, b);
+        string a;
+        getline(ip, a);
+        string res;
+        for(int i = 0; i < a.length(); i++)
         {
-            if(a[i] >= 'a' || a[i] <= 'z')
-                res[j++] = b[a[i]-'a'-1];
+            if(a[i] >= 'a' && a[i] <= 'z')
+                res.push_back(toupper(b[a[i]-'a']));
             else
-                res[j++] = a[i];
+                res.push_back(a[i]);
         }
         of<<res;
         of<<endl;
@@ -70,7 +69,39 @@ void p_to_c(string file, string ofile, string key)
 
 void c_to_p(string file, string ofile, string key)
 {
-    
+    if(isValidKey(key) == false)
+    {
+        cout<<"Invalid Key\nExiting !!\n";
+        exit(0);
+    }
+    ifstream ip(file.c_str());
+    ifstream ip2(key.c_str());
+    ofstream of(ofile.c_str());
+
+    while(!ip.eof())
+    {
+        string b;
+        getline(ip2, b);
+        string a;
+        getline(ip, a);
+        string res;
+        for(int i = 0; i < a.length(); i++)
+        {
+            if(a[i] >= 'A' && a[i] <= 'Z')
+            {
+                for(int j = 0; j < b.length(); j++)
+                {
+                    if(a[i] == toupper(b[j]))
+                    {
+                        res.push_back(char('a'+ j));
+                    }
+                }
+            }
+            else
+                res.push_back(a[i]);
+        }
+        of<<res;
+    }
 }
 
 int main()
