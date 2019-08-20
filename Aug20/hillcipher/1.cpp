@@ -2,8 +2,9 @@
 
 #include<bits/stdc++.h>
 using namespace std;
+#define N 5
 
-int** multiply(int m1, int m2, int mat1[][2], int n1, int n2, int mat2[][2]) 
+int** multiply(int m1, int m2, int mat1[][N], int n1, int n2, int mat2[][N]) 
 { 
     int x, i, j;
     int **res = new int *[m1];
@@ -40,7 +41,7 @@ int **mmod(int m1, int m2, int **ct)
     return ct;
 }
 
-void p_to_c(string file, string ofile, int key[2][2], int k_s)
+void p_to_c(string file, string ofile, int key[N][N], int k_s)
 {
     ifstream ip(file.c_str());
     ofstream of(ofile.c_str());
@@ -49,21 +50,21 @@ void p_to_c(string file, string ofile, int key[2][2], int k_s)
         a.push_back('x');
     while(!ip.eof())
         getline(ip, a);
-    int pt[1][2];
+    int pt[1][N];
     string res;
-    for(int i = 0; i < a.length(); i += 2)
+    for(int i = 0; i < a.length(); i += k_s)
     {
-        pt[0][0] = int(a[i]-'a');
-        pt[0][1] = int(a[i+1]-'a');
-        int **ct = multiply(1, 2, pt, 2, 2, key);
-        ct = mmod(1, 2, ct);
-        for(int i = 0; i < 2; i++)
+        for(int j = 0; j < k_s; j++)
+            pt[0][j] = int(a[i+j]-'a');
+        int **ct = multiply(1, k_s, pt, k_s, k_s, key);
+        ct = mmod(1, k_s, ct);
+        for(int i = 0; i < k_s; i++)
             res.push_back(char(toupper('a'+ct[0][i])));
     }
     of<<res;
 }
 
-int det_k(int mat[2][2], int n)   
+int det_k(int mat[N][N], int n)   
 {   
     int num1,num2,det = 1,index,total = 1; 
     int temp[n + 1]; 
@@ -118,7 +119,7 @@ int det_inverse(int det)
     return i;
 }
 
-void getCofactor(int A[2][2], int temp[2][2], int p, int q, int n) 
+void getCofactor(int A[N][N], int temp[N][N], int p, int q, int n) 
 { 
     int i = 0, j = 0; 
     for (int row = 0; row < n; row++) 
@@ -138,13 +139,13 @@ void getCofactor(int A[2][2], int temp[2][2], int p, int q, int n)
     } 
 } 
 
-int determinant(int A[2][2], int n) 
+int determinant(int A[N][N], int n) 
 { 
     int D = 0;
     if (n == 1) 
         return A[0][0]; 
   
-    int temp[2][2];
+    int temp[N][N];
   
     int sign = 1;
     for (int f = 0; f < n; f++) 
@@ -157,28 +158,27 @@ int determinant(int A[2][2], int n)
     return D; 
 } 
 
-void adjoint(int A[2][2],int adj[2][2]) 
+void adjoint(int A[N][N],int adj[N][N], int k_s) 
 { 
-    int N = 2;
     if (N == 1) 
     { 
         adj[0][0] = 1; 
         return; 
     } 
-    int sign = 1, temp[2][2]; 
+    int sign = 1, temp[N][N]; 
   
-    for (int i=0; i<N; i++) 
+    for (int i=0; i<k_s; i++) 
     { 
-        for (int j=0; j<N; j++) 
+        for (int j=0; j<k_s; j++) 
         { 
-            getCofactor(A, temp, i, j, N); 
+            getCofactor(A, temp, i, j, k_s); 
             sign = ((i+j)%2==0)? 1: -1;
-            adj[j][i] = (sign)*(determinant(temp, N-1)); 
+            adj[j][i] = (sign)*(determinant(temp, k_s-1)); 
         } 
     } 
 } 
 
-void pp(int a[2][2], int n, int m)
+void pp(int a[N][N], int n, int m)
 {
     for(int i = 0; i < n; i++)
     {
@@ -188,7 +188,7 @@ void pp(int a[2][2], int n, int m)
     }
 }
 
-void mmmod(int adj[2][2], int n, int m)
+void mmmod(int adj[N][N], int n, int m)
 {
     for(int i = 0; i < n; i++)
     {
@@ -209,9 +209,9 @@ void mmmod(int adj[2][2], int n, int m)
     }
 }
 
-void c_to_p(string file, string ofile, int key[2][2], int k_s)
+void c_to_p(string file, string ofile, int key[N][N], int k_s)
 {
-    int key_final[k_s][k_s];
+    int key_final[N][N];
     for(int i = 0; i < k_s; i++)
         for(int j = 0; j < k_s; j++)
             key_final[i][j] = key[i][j];
@@ -223,20 +223,19 @@ void c_to_p(string file, string ofile, int key[2][2], int k_s)
     
     int det = det_k(key, k_s);
     int det_inv = det_inverse(det);
-    int adj[k_s][k_s];
-    adjoint(key_final, adj);
+    int adj[N][N];
+    adjoint(key_final, adj, k_s);
     for(int i = 0; i < k_s; i++)
         for(int j = 0; j < k_s; j++)
             adj[i][j] = det_inv*adj[i][j];
     mmmod(adj, k_s, k_s);
 
-    int ct[1][k_s];
+    int ct[1][N];
     string res;
     for(int i = 0; i < a.length(); i += k_s)
     {
         for(int j = 0; j < k_s; j++)
-            ct[0][j] = int(a[i]-'A');
-        // ct[0][1] = int(a[i+1]-'A');
+            ct[0][j] = int(a[i+j]-'A');
         int **pt = multiply(1, k_s, ct, k_s, k_s, adj);
         pt = mmod(1, k_s, pt);
         for(int i = 0; i < k_s; i++)
@@ -251,7 +250,7 @@ int main()
     cout<<"Enter size of key: ";
     cin>>k_s;
     cout<<"Enter Key: ";
-    int key[k_s][k_s];
+    int key[N][N];
     for(int i = 0; i < k_s; i++)
         for(int j = 0; j < k_s; j++)
             cin>>key[i][j];
