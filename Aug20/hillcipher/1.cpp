@@ -40,12 +40,12 @@ int **mmod(int m1, int m2, int **ct)
     return ct;
 }
 
-void p_to_c(string file, string ofile, int key[2][2])
+void p_to_c(string file, string ofile, int key[2][2], int k_s)
 {
     ifstream ip(file.c_str());
     ofstream of(ofile.c_str());
     string a;
-    if(a.length() % 2 != 0)
+    if(a.length() % k_s != 0)
         a.push_back('x');
     while(!ip.eof())
         getline(ip, a);
@@ -209,11 +209,11 @@ void mmmod(int adj[2][2], int n, int m)
     }
 }
 
-void c_to_p(string file, string ofile, int key[2][2])
+void c_to_p(string file, string ofile, int key[2][2], int k_s)
 {
-    int key_final[2][2];
-    for(int i = 0; i < 2; i++)
-        for(int j = 0; j < 2; j++)
+    int key_final[k_s][k_s];
+    for(int i = 0; i < k_s; i++)
+        for(int j = 0; j < k_s; j++)
             key_final[i][j] = key[i][j];
     ifstream ip(file.c_str());
     ofstream of(ofile.c_str());
@@ -221,24 +221,25 @@ void c_to_p(string file, string ofile, int key[2][2])
     while(!ip.eof())
         getline(ip, a);
     
-    int det = det_k(key, 2);
+    int det = det_k(key, k_s);
     int det_inv = det_inverse(det);
-    int adj[2][2];
+    int adj[k_s][k_s];
     adjoint(key_final, adj);
-    for(int i = 0; i < 2; i++)
-        for(int j = 0; j < 2; j++)
+    for(int i = 0; i < k_s; i++)
+        for(int j = 0; j < k_s; j++)
             adj[i][j] = det_inv*adj[i][j];
-    mmmod(adj, 2, 2);
+    mmmod(adj, k_s, k_s);
 
-    int ct[1][2];
+    int ct[1][k_s];
     string res;
-    for(int i = 0; i < a.length(); i += 2)
+    for(int i = 0; i < a.length(); i += k_s)
     {
-        ct[0][0] = int(a[i]-'A');
-        ct[0][1] = int(a[i+1]-'A');
-        int **pt = multiply(1, 2, ct, 2, 2, adj);
-        pt = mmod(1, 2, pt);
-        for(int i = 0; i < 2; i++)
+        for(int j = 0; j < k_s; j++)
+            ct[0][j] = int(a[i]-'A');
+        // ct[0][1] = int(a[i+1]-'A');
+        int **pt = multiply(1, k_s, ct, k_s, k_s, adj);
+        pt = mmod(1, k_s, pt);
+        for(int i = 0; i < k_s; i++)
             res.push_back(char('a'+pt[0][i]));
     }
     of<<res;
@@ -246,10 +247,13 @@ void c_to_p(string file, string ofile, int key[2][2])
 
 int main()
 {
+    int k_s;
+    cout<<"Enter size of key: ";
+    cin>>k_s;
     cout<<"Enter Key: ";
-    int key[2][2];
-    for(int i = 0; i < 2; i++)
-        for(int j = 0; j < 2; j++)
+    int key[k_s][k_s];
+    for(int i = 0; i < k_s; i++)
+        for(int j = 0; j < k_s; j++)
             cin>>key[i][j];
     cout<<"Choose the following: \n1. Encrypt a file\n2. Decrypt a file\n";
     int ch;
@@ -263,14 +267,14 @@ int main()
                     cin>>file;
                     cout<<"name the output file: ";
                     cin>>ofile;
-                    p_to_c(file, ofile, key);
+                    p_to_c(file, ofile, key, k_s);
                     break;
 
             case 2: cout<<"name the file to decrpyt: ";
                     cin>>file;
                     cout<<"name the output file: ";
                     cin>>ofile;
-                    c_to_p(file, ofile, key);
+                    c_to_p(file, ofile, key, k_s);
                     break;
 
             default:cout<<"Enter correct choice\n";
