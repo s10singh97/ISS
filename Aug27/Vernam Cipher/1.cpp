@@ -44,7 +44,7 @@ void c_to_p(string file, string ofile, string key)
         if(a[i] >= 'A' && a[i] <= 'Z')
         {
             int ind = ((a[i] - 'A') ^ (kk[(j++) % kk.length()] - 'a'));
-            if(ind < 26)
+            if(ind < 0)
                 ind = ind + 26;
             res.push_back((ind % 26) + 'a');
         }
