@@ -4,8 +4,8 @@
 using namespace std;
 #define N 5
 
-
-void print(char mat[N][N], int r, int s)
+char mat[N][N];
+void print(int r, int s)
 {
     for(int r = 0; r < 5; r++)
     {
@@ -36,18 +36,18 @@ int cc(string kk)
     return count;
 }
 
-string search(char a, char b, char mat[N][N])
+string search(char a, char b)
 {
     int xa, xb, ya, yb;
     for(int i = 0; i < N; i++)
     {
         for(int j = 0; j < N; j++)
         {
-            if(mat[i][j] == a)
+            if(mat[i][j] == toupper(a))
             {
                 xa = i; ya = j;
             }
-            if(mat[i][j] == b)
+            if(mat[i][j] == toupper(b))
             {
                 xb = i; yb = j;
             }
@@ -80,21 +80,21 @@ string search(char a, char b, char mat[N][N])
     }
 }
 
-void pl_encrypt(char mat[N][N], ofstream *of, string a)
+void pl_encrypt(ofstream *of, string a)
 {
     int count = 0; 
+    string b;
     for (int i = 0; i < a.length(); i++) 
-        if (a[i] != ' ' || a[i] != '.') 
-            a[count++] = a[i]; 
-    a[count] = '\0'; 
-    
+        if (a[i] == ' ')
+            continue;
+        else 
+            b.push_back(a[i]); 
 
-    if(a.length() % 2 != 0)
-        a.push_back('x');
-    string res;
-    for(int i = 0; i < a.length()-1; i += 2)
+    if(b.length() % 2 != 0)
+        b.push_back('x');
+    for(int i = 0; i < b.length()-1; i += 2)
     {
-        string p1 = search(a[i], a[i+1], mat);
+        string p1 = search(b[i], b[i+1]);
         *of<<p1;
     }
 }
@@ -110,7 +110,6 @@ void p_to_c(string file, string ofile, string key)
     string kk;
     while(!k.eof())
         getline(k, kk);
-    char mat[N][N];
     int count = cc(kk);
     
     bool vis[26] = {false};
@@ -147,10 +146,79 @@ void p_to_c(string file, string ofile, string key)
         }
     }
     
-    print(mat, 5 ,5);
+    print(5 ,5);
 
-    pl_encrypt(mat, &of, a);
+    pl_encrypt(&of, a);
 
+}
+
+string search_decrypt(char a, char b)
+{
+    int xa, xb, ya, yb;
+    for(int i = 0; i < N; i++)
+    {
+        for(int j = 0; j < N; j++)
+        {
+            if(mat[i][j] == a)
+            {
+                xa = i; ya = j;
+            }
+            if(mat[i][j] == b)
+            {
+                xb = i; yb = j;
+            }
+        }
+    }
+    string res;
+    if(xa == xb)
+    {
+        char p1, p2;
+        if(ya-1 >= 0)
+            p1 = mat[xa][(ya-1)%N];
+        else
+            p1 = mat[xa][ya-1+N];
+        if(yb-1 >= 0)
+            p2 = mat[xb][(yb-1)%N];
+        else
+            p2 = mat[xb][yb-1+N];
+        
+        res.push_back(tolower(p1));
+        res.push_back(tolower(p2));
+        return res;
+    }
+    else if(ya == yb)
+    {
+        char p1, p2;
+        if(xa-1 >= 0)
+            p1 = mat[(xa-1)%N][ya];
+        else
+            p1 = mat[xa-1+N][ya];
+        if(xb-1 >= 0)
+            p2 = mat[(xb-1)%N][yb];
+        else
+            p2 = mat[xb-1+N][yb];
+
+        res.push_back(tolower(p1));
+        res.push_back(tolower(p2));
+        return res;
+    }
+    else
+    {
+        char p1 = mat[xa][yb];
+        char p2 = mat[xb][ya];
+        res.push_back(tolower(p1));
+        res.push_back(tolower(p2));
+        return res;
+    }   
+}
+
+void cl_decrypt(ofstream *of, string a)
+{
+    for(int i = 0; i < a.length()-1; i += 2)
+    {
+        string p1 = search_decrypt(a[i], a[i+1]);
+        *of<<p1;
+    }
 }
 
 void c_to_p(string file, string ofile, string key)
@@ -161,7 +229,47 @@ void c_to_p(string file, string ofile, string key)
     string a;
     while(!ip.eof())
         getline(ip, a);
+    string kk;
+    while(!k.eof())
+        getline(k, kk);
+    int count = cc(kk);
     
+    bool vis[26] = {false};
+    int i = 0, j = 0;
+    for(int l = 0; l < count; l++)
+    {
+        if(vis[kk[l]-'A'] == false)
+        {
+            mat[i][j] = kk[l];
+            vis[kk[l]-'A'] = true;
+            j++;
+            if(j % 5 == 0)
+            {
+                i++;
+                j = 0;
+            }
+        }
+    }
+    
+    for(int l = 0; l < 26; l++)
+    {
+        if(vis[l] == false)
+        {
+            if('A'+ l == 'J')
+                continue;
+            mat[i][j] = char('A'+ l);
+            vis[l] = true;
+            j++;
+            if(j % 5 == 0)
+            {
+                i++;
+                j = 0;
+            }
+        }
+    }
+
+
+    cl_decrypt(&of, a);
 }
 
 int main()
