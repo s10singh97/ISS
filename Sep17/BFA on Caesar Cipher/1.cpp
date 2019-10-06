@@ -1,4 +1,4 @@
-// Letter frequency attack on additive (caesar) cipher
+// Brute Force attack on additive (caesar) cipher
 
 #include<bits/stdc++.h>
 using namespace std;
