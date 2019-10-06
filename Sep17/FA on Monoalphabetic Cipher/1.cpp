@@ -1,4 +1,4 @@
-// Frequency attack on additive (caesar) cipher
+// Frequency attack on monoalphabetic cipher
 
 #include<bits/stdc++.h>
 using namespace std;
