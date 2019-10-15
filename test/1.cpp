@@ -2,6 +2,32 @@
 #include<random>
 using namespace std;
 
+#define N 10
+int k[N][N];
+vector<char> v;
+
+void func(char ch, char p, vector<char> &bb, int l)
+{
+    for(int i = 0; i < l; i++)
+    {
+        if(k[ch-'A'][i] == 1 && v[i] != p)
+        {
+            bb.push_back(v[i]);
+            func(v[i], ch, bb, l);
+        }
+        if(k[ch-'A'][i] == 1 && v[i] == p)
+        {
+            bb.push_back('|');
+        }
+    }
+}
+
+void print(vector<char> bb)
+{
+    for(int i = 0; i < bb.size(); i++)
+        cout<<bb[i]<<" ";
+}
+
 int main()
 {
     int n;
@@ -10,10 +36,13 @@ int main()
     cin>>file;
     cout<<"Enter number of nodes : ";
     cin>>n;
-    int k[n][n] = {0};
+    // int k[n][n];
+    int l = n;
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < n; j++)
+            k[i][j] = 0;
     ifstream in(file.c_str());
     char a, b;
-    vector<char> v;
     while(in)
     {
         if(n == 0)
@@ -22,63 +51,36 @@ int main()
         v.push_back(a);
         n--;
     }
-    // for(int i = 0; i < v.size(); i++)
-    //     cout<<v[i]<<" ";
+    vector<pair<char, char> >vv;
     while(in)
     {
         in>>a>>b;
-        k[int(a-'A')][int(b-'A')] = 1;
-        k[int(b-'A')][int(a-'A')] = 1;
+        vv.push_back(make_pair(a, b));
     }
 
-    for(int i = 0; i < n; i++)
+    for(int i = 0; i < v.size(); i++)
     {
-        for(int j = 0; j < n; j++)
+        k[vv[i].first-'A'][vv[i].second-'A'] = 1;
+        k[vv[i].second-'A'][vv[i].first-'A'] = 1;
+    }
+    for(int i = 0; i < l; i++)
+    {
+        for(int j = 0; j < l; j++)
         {
             cout<<k[i][j]<<"\t";
         }
         cout<<"\n";
     }
 
-    // cout<<"\n";
-    // vector<string> edge;
-    // while(in)
-    // {
-    //     getline(in, a);
-    //     for(int i = 0; i < a.length(); i += 2)
-    //     {
-    //         if(a[i] == ' ')
-    //             continue;
-    //         else
-    //         {
-    //             edge.push_back(""+a[i]+a[i+1]);
-    //         }
-    //     }
-    // }
-    // for(int i = 0; i < edge.size(); i++)
-    //     cout<<edge[i]<<" ";
+    for(int i = 0; i < l; i++)
+    {
+        vector<char> bb;
+        func(v[i], ' ', bb, l);
+        cout<<v[i]<<" -> ";
+        print(bb);
+        cout<<"\n";
+    }
 
 
-    // char ch, a, b;
-    // int n;
-    // vector<pair<int, int> >v;
-    // cout<<"Enter number of nodes : ";
-    // cin>>n;
-    // cout<<"Enter nodes : ";
-    // vector<char> in(n);
-    // for(int i = 0; i < n; i++)
-    // {
-    //     cin>>in[i];
-    //     cout<<in[i];
-    // }
-    // do
-    // {
-    //     cout<<"Enter graph in as(node node): ";
-    //     cin>>a>>b;
-    //     v.push_back(make_pair(a, b));
-    //     cout<<"do you want to enter more ? [Y/N]";
-    //     cin>>ch;
-    // }while(ch == 'Y' || ch == 'y');
-    
     return 0;
 }
