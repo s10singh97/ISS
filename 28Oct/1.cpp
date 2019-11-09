@@ -125,12 +125,13 @@ void c_to_p(string file, string ofile, string key)
 int main()
 {
     srand(time(NULL));
-    cout<<"Choose the following: \n1. Key Generation\n2. Encrypt a file\n3. Decrypt a file\n4. Exit\n";
-    int ch;
-    cin>>ch;
     string ofile, file, key;
     char c = 'y';
-    do{
+    do
+    {
+        cout<<"Choose the following: \n1. Key Generation\n2. Encrypt a file\n3. Decrypt a file\n4. Exit\n";
+        int ch;
+        cin>>ch;
         switch(ch)
         {
             case 1: key_gen();
